@@ -1,0 +1,92 @@
+//  Day 6 task3 - Practice locators (playwright getBy, CSS, Xpath) using leaftaps and salesforce
+
+import {test,expect} from '@playwright/test'
+
+// a. login to leaftaps, create a lead
+test('create a lead', async ({ page }) => {
+    await page.goto("https://leaftaps.com/opentaps/control/main")
+    await page.getByLabel(`Username`).fill("democsr")
+    await page.getByLabel(`Password`).fill("crmsfa")
+    await page.getByRole(`button`).click()
+    await page.getByRole(`link`, { name: "CRM/SFA" }).click()
+    await page.getByRole(`link`, { name: "Leads" }).click()
+    await page.getByRole(`link`, { name: "Create Lead" }).click()
+    await page.locator(`#createLeadForm_companyName`).fill("KAA Corp")
+    await page.locator(`#createLeadForm_firstName`).fill("Ammitha")
+    await page.locator(`#createLeadForm_lastName`).fill("A")
+    await page.locator(`#createLeadForm_personalTitle`).fill("Ms")
+    await page.locator(`#createLeadForm_generalProfTitle`).fill("Automation Tester")
+    await page.locator(`#createLeadForm_annualRevenue`).fill("5,000,000")
+    await page.locator(`#createLeadForm_departmentName`).fill("IT services")
+    await page.locator(`#createLeadForm_primaryPhoneNumber`).fill("9876543210")
+    await page.locator(`.smallSubmit`).click()
+    const compName = await page.locator(`#viewLead_companyName_sp`).innerText()
+    console.log("Company name is " + compName)
+    const firstName = await page.locator(`#viewLead_firstName_sp`).innerText()
+    console.log("First name is " + firstName)
+    const lastName = await page.locator(`#viewLead_lastName_sp`).innerText()
+    console.log("Last name is " + lastName)
+    const status = await page.locator(`#viewLead_statusId_sp`).innerText()
+    console.log("Status is " + status)
+    const title = await page.title()
+    console.log(title)
+
+})
+
+// b. login to leaftaps, edit a lead
+test('edit a lead', async ({ page }) => {
+    await page.goto("https://leaftaps.com/opentaps/control/main")
+    await page.getByLabel(`Username`).fill("democsr")
+    await page.getByLabel(`Password`).fill("crmsfa")
+    await page.getByRole(`button`).click()
+    await page.getByRole(`link`, { name: "CRM/SFA" }).click()
+    await page.getByRole(`link`, { name: "Leads" }).click()
+    await page.getByRole(`link`, { name: "Find Leads" }).click()
+    await page.getByRole(`textbox`, { name: "First name" }).fill("Ammitha")
+    await page.getByRole(`button`, { name: "Find Leads" }).click()
+    await page.getByRole(`link`, { name: "10794" }).click()
+    await page.getByRole(`link`, { name: "Edit" }).click()
+    await page.locator(`#updateLeadForm_companyName`).fill("KAA")
+    await page.locator(`#updateLeadForm_annualRevenue`).fill("2,000,000")
+    await page.locator(`#updateLeadForm_departmentName`).fill("IT")
+    await page.locator(`#updateLeadForm_description`).fill("updated company name, revenue and annual revenue")
+    await page.getByRole('button', { name: "Update" }).click()
+    const updatedCompName = await page.locator(`#viewLead_companyName_sp`).innerText()
+    console.log("Company name is " + updatedCompName)
+    const deptName = await page.locator(`#viewLead_departmentName_sp`).innerText()
+    console.log("Dept Name is " + deptName)
+    const revenue = await page.locator(`#viewLead_annualRevenue_sp`).innerText()
+    console.log("Revenue is " + revenue)
+    const title = await page.title()
+    console.log(title)
+
+})
+
+// c. Create a new salesforce acc
+test('create a new salesforce acc', async ({ page }) => {
+    await page.goto("https://login.salesforce.com/")
+    await page.getByLabel(`Username`).fill("dilipkumar.rajendran@testleaf.com")
+    await page.getByLabel(`Password`).fill("TestLeaf@2025")
+    await page.getByRole(`button`,{name: "Log In"}).click()
+    await page.waitForTimeout(3000)
+    const pageTitle = await page.title()
+    console.log("Title of the page is "+ pageTitle)
+    await expect(page).toHaveTitle('Home | Salesforce')
+    const url = page.url()
+    console.log("Url is "+ url)
+    await expect(page).toHaveURL('https://testleaf.lightning.force.com/lightning/page/home')
+    await page.locator(`.slds-icon-waffle`).click()
+    await page.waitForTimeout(3000)
+    await page.getByText(`View All`).last().click()
+    await page.getByPlaceholder(`Search apps or items...`).fill("Service")
+    await page.locator(`(//p[@role='presentation'])[1]`).click()
+    await page.locator(`a[title='Accounts']`).click()
+    await page.getByRole(`button`,{name: "New"}).click()
+    await page.locator(`input[name='Name']`).fill("Ammitha")
+    await page.locator(`//button[text()='Save']`).click()
+    const toastMsg = await page.locator(`//div[contains(@class,'forceToastMessage')]`).innerText()
+    console.log(toastMsg)
+})
+
+
+// completed
